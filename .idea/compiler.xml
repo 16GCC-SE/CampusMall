@@ -11,7 +11,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="campusMall" target="1.5" />
-      <module name="CMserver" target="1.5" />
+      <module name="CMserver" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
