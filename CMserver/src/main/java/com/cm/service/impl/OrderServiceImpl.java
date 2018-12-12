@@ -131,6 +131,9 @@ public class OrderServiceImpl implements IOrderService {
         if (CollectionUtils.isEmpty(orderItemList)) {
             return ServerResponse.createByErrorMessage("购物车为空");
         }
+        for (OrderItem orderItem : orderItemList){
+            orderItem.setOrderNo(order.getOrderNo());
+        }
         //mybatis 批量插入
         orderItemMapper.batchInsert(orderItemList);
 
@@ -213,7 +216,7 @@ public class OrderServiceImpl implements IOrderService {
 
     private void reduceProductStock(List<OrderItem>orderItemList){
         for (OrderItem orderItem : orderItemList){
-            Product product = productMapper.selectByPrimaryKey(orderItem.getId());
+            Product product = productMapper.selectByPrimaryKey(orderItem.getProductId());
             product.setStock(product.getStock()-orderItem.getQuantity());
             productMapper.updateByPrimaryKeySelective(product);
         }
@@ -257,7 +260,7 @@ public class OrderServiceImpl implements IOrderService {
     private ServerResponse getCartOrderItem(Integer userId,List<Cart>cartList){
         List<OrderItem> orderItemList = Lists.newArrayList();
         if (CollectionUtils.isEmpty(cartList)){
-            return ServerResponse.createBySuccessMessage("购物车为空");
+            return ServerResponse.createByErrorMessage("购物车为空");
         }
         for (Cart cartItem:cartList){
             OrderItem orderItem = new OrderItem();
