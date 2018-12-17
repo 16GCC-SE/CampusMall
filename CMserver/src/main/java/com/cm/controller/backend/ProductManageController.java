@@ -91,7 +91,9 @@ public class ProductManageController {
     //后台
     @RequestMapping(value = "list.do",method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse getList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,@RequestParam(value = "pageSize",defaultValue = "10") int pageSize){
+    public ServerResponse getList(HttpServletResponse response,HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,@RequestParam(value = "pageSize",defaultValue = "10") int pageSize){
+        response.setHeader("Content-Type","application/json;charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin","*");
         User user = (User)session.getAttribute(Const.CURRENT_USER);
         if (user == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
