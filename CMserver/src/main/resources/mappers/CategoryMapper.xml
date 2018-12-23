@@ -21,6 +21,12 @@
     from category_table
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="selectByPIdName" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List"/>
+    from category_table
+    where parent_id = #{parentId} and name = #{categoryName}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from category_table
     where id = #{id,jdbcType=INTEGER}

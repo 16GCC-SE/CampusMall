@@ -1,6 +1,7 @@
 package com.cm.dao;
 
 import com.cm.pojo.Category;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -18,4 +19,7 @@ public interface CategoryMapper {
     int updateByPrimaryKey(Category record);
 
     List<Category> selectCategoryChildrenByParentId(Integer parentId);
+
+    Category selectByPIdName(@Param("parentId")Integer parentId,@Param("categoryName")String categoryName);
+
 }

@@ -137,6 +137,7 @@ public class ProductServiceImpl implements IProductService {
         productListVo.setCategoryId(product.getCategoryId());
         productListVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://img.happymmall.com/"));
         productListVo.setName(product.getName());
+        productListVo.setPrice(product.getPrice());
         productListVo.setMainImage(product.getMainImage());
         productListVo.setSubtitle(product.getSubtitle());
         productListVo.setStatus(product.getStatus());
@@ -190,7 +191,7 @@ public class ProductServiceImpl implements IProductService {
                 PageInfo pageInfo = new PageInfo(productListVoList);
                 return ServerResponse.createBySuccess(pageInfo);
             }
-            categoryIdList = iCategoryService.selectCategoryAndChildrenById(category.getId()).getData();
+            categoryIdList = iCategoryService.selectCategoryIdAndChildrenIdById(category.getId()).getData();
         }
         if (StringUtils.isNotBlank(keyword)){
             keyword = new StringBuilder().append("%").append(keyword).append("%").toString();

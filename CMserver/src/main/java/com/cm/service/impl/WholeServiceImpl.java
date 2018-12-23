@@ -11,6 +11,7 @@ import com.cm.pojo.User;
 import com.cm.service.IWholeService;
 import com.cm.util.BigDecimalUtil;
 import com.cm.util.JsonUtil;
+import com.cm.util.PropertiesUtil;
 import com.cm.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -148,12 +149,13 @@ public class WholeServiceImpl implements IWholeService {
     private List<JCategoryGoodVo> assembleJCategoryGoods(Integer mId){
         List<Integer> integerList = new ArrayList<>();
         integerList.add(mId);
+        integerList.add(1);
         List<Product> productList = productMapper.selectByNameAndCategoryIds(null,integerList);
         List<JCategoryGoodVo> jCategoryGoodVoList = new ArrayList<>();
         for (Product product : productList){
             JCategoryGoodVo jCategoryGoodVo = new JCategoryGoodVo();
             jCategoryGoodVo.setProduct_id(product.getId());
-            jCategoryGoodVo.setProduct_img_url(product.getMainImage());
+            jCategoryGoodVo.setProduct_img_url(PropertiesUtil.getProperty("ftp.server.http.prefix","http://192.168.88.157/img/") + product.getMainImage());
             jCategoryGoodVo.setProduct_name(product.getName());
             jCategoryGoodVoList.add(jCategoryGoodVo);
         }
@@ -163,11 +165,14 @@ public class WholeServiceImpl implements IWholeService {
     private List<JCategoryVo> assembleJCategoryVo(){
         List<Category> categoryList = categoryMapper.selectCategoryChildrenByParentId(0);
         List<JCategoryVo> jCategoryVoList = new ArrayList<>();
-        for (Category item : categoryList){
-            JCategoryVo jCategoryVo = new JCategoryVo();
-            jCategoryVo.setCategory_id(item.getId());
-            jCategoryVo.setCategory_name(item.getName());
-            jCategoryVoList.add(jCategoryVo);
+        for (Category category : categoryList){
+            List<Category> childNotes = categoryMapper.selectCategoryChildrenByParentId(category.getId());
+            for (Category item : childNotes){
+                JCategoryVo jCategoryVo = new JCategoryVo();
+                jCategoryVo.setCategory_id(item.getId());
+                jCategoryVo.setCategory_name(item.getName());
+                jCategoryVoList.add(jCategoryVo);
+            }
         }
         return jCategoryVoList;
     }
@@ -183,7 +188,7 @@ public class WholeServiceImpl implements IWholeService {
     private JHomeVo assembleJHomeVo(Product product){
         JHomeVo jHomeVo = new JHomeVo();
         jHomeVo.setProduct_id(product.getId());
-        jHomeVo.setProduct_img_url(product.getMainImage());
+        jHomeVo.setProduct_img_url(PropertiesUtil.getProperty("ftp.server.http.prefix") + product.getMainImage());
         jHomeVo.setProduct_name(product.getName());
         jHomeVo.setProduct_price(product.getPrice());
         jHomeVo.setProduct_uprice(BigDecimalUtil.add(product.getPrice().doubleValue(), 50));

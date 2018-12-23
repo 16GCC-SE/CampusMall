@@ -37,7 +37,11 @@ public class CategoryServiceImpl implements ICategoryService {
 
         int rowCount = categoryMapper.insert(category);
         if (rowCount > 0){
-            return ServerResponse.createBySuccessMessage("添加品类成功");
+            Category category1 = categoryMapper.selectByPIdName(category.getParentId(),category.getName());
+//            return ServerResponse.createBySuccessMessage("添加品类成功");
+            if (category1 != null){
+                return ServerResponse.createBySuccess(category1);
+            }
         }
         return ServerResponse.createByErrorMessage("添加品类失败");
     }
@@ -48,7 +52,6 @@ public class CategoryServiceImpl implements ICategoryService {
         Category category = new Category();
         category.setId(categoryId);
         category.setName(categoryName);
-
         int rowCount = categoryMapper.updateByPrimaryKeySelective(category);
         if (rowCount > 0){
             return ServerResponse.createBySuccessMessage("更新品类名字成功");
@@ -64,13 +67,25 @@ public class CategoryServiceImpl implements ICategoryService {
         return ServerResponse.createBySuccess(categoryList);
     }
 
-    public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId){
+    public ServerResponse<List<Integer>> selectCategoryIdAndChildrenIdById(Integer categoryId){
         Set<Category> categorySet = Sets.newHashSet();
         findChildCategory(categorySet,categoryId);
         List<Integer> categoryIdList = Lists.newArrayList();
         if (categoryId != null){
             for (Category categoryItem:categorySet) {
                 categoryIdList.add(categoryItem.getId());
+            }
+        }
+        return ServerResponse.createBySuccess(categoryIdList);
+    }
+
+    public ServerResponse<List<Category>> selectCategoryAndChildrenById(Integer categoryId){
+        Set<Category> categorySet = Sets.newHashSet();
+        findChildCategory(categorySet,categoryId);
+        List<Category> categoryIdList = Lists.newArrayList();
+        if (categoryId != null){
+            for (Category categoryItem:categorySet) {
+                categoryIdList.add(categoryItem);
             }
         }
         return ServerResponse.createBySuccess(categoryIdList);
