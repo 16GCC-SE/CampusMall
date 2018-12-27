@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE> ZTREE DEMO - beforeEditName / beforeRemove / onRemove / beforeRename / onRename</TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="css/demo.css" type="text/css">
+	<link rel="stylesheet" href="css/zTreeStyle/zTreeStyle.css" type="text/css">
+	<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="js/jquery.ztree.core.js"></script>
+	<script type="text/javascript" src="/js/jquery.ztree.excheck.js"></script>
+	<script type="text/javascript" src="js/jquery.ztree.exedit.js"></script>
+	<!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<SCRIPT type="text/javascript">
+		<!--
+		var setting = {
+			view: {
+				addHoverDom: addHoverDom,
+				removeHoverDom: removeHoverDom,
+				selectedMulti: false
+			},
+			edit: {
+				enable: true,
+				editNameSelectAll: true,
+				showRemoveBtn: showRemoveBtn,
+				showRenameBtn: showRenameBtn
+			},
+			data: {
+				simpleData: {
+					enable: true,
+					idKey:"id",
+					pIdKey:"parentId",
+					name:"name",
+					rootPId:0
+				}
+			},
+			callback: {
+				beforeDrag: beforeDrag,
+				beforeEditName: beforeEditName,
+				beforeRemove: beforeRemove,
+				beforeRename: beforeRename,
+				onRemove: onRemove,
+				onRename: onRename
+			}
+		};
+
+		var zNodes =[];
+		var log, className = "dark";
+		function beforeDrag(treeId, treeNodes) {
+			return false;
+		}
+		function beforeEditName(treeId, treeNode) {
+			className = (className === "dark" ? "":"dark");
+			showLog("[ "+getTime()+" beforeEditName ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.selectNode(treeNode);
+			setTimeout(function() {
+				if (confirm("进入节点 -- " + treeNode.name + " 的编辑状态吗？")) {
+					setTimeout(function() {
+						zTree.editName(treeNode);
+					}, 0);
+				}
+			}, 0);
+			return false;
+		}
+		function beforeRemove(treeId, treeNode) {
+			className = (className === "dark" ? "":"dark");
+			showLog("[ "+getTime()+" beforeRemove ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.selectNode(treeNode);
+			if(confirm("确认删除 节点 -- " + treeNode.name + " 吗？")){
+			    return true;
+//                $.ajax({
+//                    type: "GET",
+//                    url: "/manage/category/set_category_name.do",
+//                    data: "categoryId=" + treeNode.id + "&categoryName=" + newName,
+//                    dataType: "json",
+//                    async: false,
+//                    success: function (data) {
+//                        if (data.status == 0){
+//                            return true;
+//                        }else {
+//                            setTimeout(function() {
+//                                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+//                                zTree.cancelEditName();
+//                                if(newName == ""){
+//                                    alert("节点名称不能为空.");
+//                                }else{
+//                                    alert(data.msg);
+//                                }
+//                            }, 0);
+//                            return false;
+//                        }
+//                    }
+//                });
+			}else {
+			    return false;
+			}
+
+		}
+		function onRemove(e, treeId, treeNode) {
+			showLog("[ "+getTime()+" onRemove ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+		}
+		function beforeRename(treeId, treeNode, newName, isCancel) {
+			className = (className === "dark" ? "":"dark");
+			showLog((isCancel ? "<span style='color:red'>":"") + "[ "+getTime()+" beforeRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>":""));
+            $.ajax({
+                type:"GET",
+                url:"/manage/category/set_category_name.do",
+				data:"categoryId="+treeNode.id+"&categoryName="+newName,
+                dataType:"json",
+                async: false,
+                success:function (data) {
+                    if (data.status == 0){
+                        return true;
+                    }else {
+                        setTimeout(function() {
+                            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                            zTree.cancelEditName();
+                            if(newName == ""){
+                                alert("节点名称不能为空.");
+							}else{
+                                alert(data.msg);
+							}
+                        }, 0);
+                        return false;
+                    }
+
+                }
+            });
+			if (newName.length == 0) {
+				setTimeout(function() {
+					var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+					zTree.cancelEditName();
+					alert("节点名称不能为空.");
+				}, 0);
+				return false;
+			}
+			return true;
+		}
+		function onRename(e, treeId, treeNode, isCancel) {
+			showLog((isCancel ? "<span style='color:red'>":"") + "[ "+getTime()+" onRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>":""));
+		}
+		function showRemoveBtn(treeId, treeNode) {
+		    if(treeNode.parentTId){
+		        return true;
+			}
+			return false;
+		}
+		function showRenameBtn(treeId, treeNode) {
+			return true;
+		}
+		function showLog(str) {
+			if (!log) log = $("#log");
+			log.append("<li class='"+className+"'>"+str+"</li>");
+			if(log.children("li").length > 8) {
+				log.get(0).removeChild(log.children("li")[0]);
+			}
+		}
+		function getTime() {
+			var now= new Date(),
+			h=now.getHours(),
+			m=now.getMinutes(),
+			s=now.getSeconds(),
+			ms=now.getMilliseconds();
+			return (h+":"+m+":"+s+ " " +ms);
+		}
+
+		var newCount = 1;
+		function addHoverDom(treeId, treeNode) {
+			var sObj = $("#" + treeNode.tId + "_span");
+			if (treeNode.editNameFlag || $("#addBtn_"+treeNode.tId).length>0) return;
+			var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+				+ "' title='add node' onfocus='this.blur();'></span>";
+			sObj.after(addStr);
+			var btn = $("#addBtn_"+treeNode.tId);
+			if (btn) btn.bind("click", function(){
+				var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                $.ajax({
+                    type:"GET",
+                    url:"/manage/category/add_category.do",
+                    data:"parentId="+treeNode.id+"&categoryName=new node"+(newCount++),
+                    dataType:"json",
+                    async: false,
+                    success:function (data) {
+                        if (data.status == 0){
+                            zTree.addNodes(treeNode, {id:data.data.id, pId:treeNode.id, name:data.data.name});
+                        }else {
+                            console.log("失败");
+                        }
+                    }
+                });
+				return false;
+			});
+		};
+		function removeHoverDom(treeId, treeNode) {
+			$("#addBtn_"+treeNode.tId).unbind().remove();
+		};
+		
+		$(document).ready(function(){
+			$.ajax({
+				type:"GET",
+				url:"/manage/category/get_deep_category.do",
+				dataType:"json",
+				success:function (data) {
+				    if (data.status == 0){
+                        zNodes = data.data;
+                        $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+					}else {
+				        console.log("失败");
+					}
+                }
+			});
+
+		});
+		//-->
+	</SCRIPT>
+	<style type="text/css">
+		.align-center{
+			padding-top: 1%;
+		}
+.ztree li span.button.add {margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle}
+	</style>
+</HEAD>
+
+<BODY>
+<div class="container align-center">
+	<div class="jumbotron">
+		<div class="page-header">
+			<h2>商品分类编辑</h2>
+		</div>
+		<div class="content_wrap">
+			<div class="zTreeDemoBackground">
+				<ul id="treeDemo" class="ztree" style="width: 400px"></ul>
+			</div>
+		</div>
+	</div>
+</div>
+</BODY>
+</HTML>

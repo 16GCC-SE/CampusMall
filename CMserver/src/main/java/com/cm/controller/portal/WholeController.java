@@ -95,6 +95,14 @@ public class WholeController {
         return iWholeService.getProductDetail(mId);
     }
 
+//    @RequestMapping(value = "/search" , produces="text/html;charset=UTF-8")
+//    @ResponseBody
+//    public String search(@Param("kw")String kw, @Param("hot")String hot, @Param("priceUp")String priceUp,@Param("priceDown")String priceDown, HttpServletResponse response){
+//        response.setHeader("Content-Type","application/json;charset=utf-8");
+//        response.setHeader("Access-Control-Allow-Origin","*");
+//        return iWholeService.getProductDetail(mId);
+//    }
+
 
     @RequestMapping(value = "/reg" ,method = RequestMethod.POST, produces="text/html;charset=UTF-8")
     @ResponseBody

@@ -108,6 +108,7 @@ public class WholeServiceImpl implements IWholeService {
     }
 
     public String getCart(Integer uId){
+        uId = 4;
         List<Cart> cartList = cartMapper.selectCartByUserId(uId);
         List<JCartVo> jCartVoList = new ArrayList<>();
         for (Cart cart : cartList){
@@ -145,6 +146,8 @@ public class WholeServiceImpl implements IWholeService {
         productDetail.add(jProductVoList);
         return JsonUtil.obj2String(productDetail);
     }
+
+    public List<>
 
     private List<JCategoryGoodVo> assembleJCategoryGoods(Integer mId){
         List<Integer> integerList = new ArrayList<>();
